@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: santhosh27/nodejs-app:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "500m"
+        securityContext:
+          runAsUser: 1000
+        envFrom:
+        - secretRef:
+            name: docker-credentials
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
