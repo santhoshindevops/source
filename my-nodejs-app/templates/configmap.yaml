@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "my-nodejs-app.fullname" . }}-configmap
+data:
+  username: {{ .Values.config.username | quote }}
+  password: {{ .Values.config.password | quote }}
