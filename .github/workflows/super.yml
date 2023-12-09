@@ -1,0 +1,35 @@
+name: CI/CD for Node.js App
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Build Docker Image
+      run: |
+        DOCKER_BUILDKIT=1 docker build \
+          --file Dockerfile \
+          --tag santhosh/nodejs-app:latest \
+          --build-arg DEPLOYED_FROM=${GITHUB_REF#refs/heads/} \
+          .
+
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u santhosh --password-stdin
+        docker push santhosh/nodejs-app:latest
+
+    - name: Deploy to Kubernetes
+      if: github.event_name == 'push' && github.ref != 'refs/heads/test'
+      run: |
+        kubectl apply -f kubernetes/deployment.yaml
