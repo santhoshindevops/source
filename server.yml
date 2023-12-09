@@ -1,0 +1,22 @@
+---
+- name: Check OS on remote server
+  hosts: remote_server
+  gather_facts: yes
+
+  tasks:
+    - name: Print OS info
+      debug:
+        var: ansible_distribution
+
+    - name: Determine OS type
+      set_fact:
+        os_type: "windows"
+      when: "ansible_os_family == 'Windows' or ansible_distribution == 'Windows'"
+
+    - set_fact:
+        os_type: "linux"
+      when: "ansible_os_family == 'Debian' or ansible_os_family == 'RedHat'" or ansible_os_family == 'Ubuntu'"
+
+    - name: Display OS type
+      debug:
+        var: os_type
