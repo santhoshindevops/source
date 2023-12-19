@@ -30,6 +30,9 @@ jobs:
         docker push santhosh27/nodejs-app:latest
 
     - name: Deploy to Kubernetes
-      if: github.event_name == 'push' && github.ref != 'refs/heads/test'
+      if: github.event_name == 'push' && github.ref = 'refs/heads/test'
       run: |
         kubectl apply -f kubernetes/deployment.yaml
+      else: github.ref = 'refs/heads/'main'
+      run: | 
+        kubectl apply -f kubernetes/deploymentmain.yaml
