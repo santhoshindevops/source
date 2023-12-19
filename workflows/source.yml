@@ -3,7 +3,7 @@ name: CI/CD for Node.js App
 on:
   push:
     branches:
-      - 'main'
+      - '*'
 
 jobs:
   build-and-deploy:
@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    with:
+    ref: 'main'
 
     - name: Chekout repository   
      uses: actions/checkout@v2
@@ -37,6 +39,6 @@ jobs:
         docker push santhosh27/nodejs-app:latest
 
     - name: Deploy to Kubernetes
-      if: github.event_name == 'push' && github.ref = 'refs/heads/test'
+      if: github.event_name == 'push' && github.ref! = 'refs/heads/test'
       run: |
         kubectl apply -f kubernetes/deployment.yaml
